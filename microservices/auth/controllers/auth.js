@@ -29,49 +29,42 @@ module.exports = {
       mobile: req.body.mobile,
       email: req.body.email,
     })
-      .then((user) => {
-        var refCode = req.body.name.replace(/[$,.\s]/g, "") + user.id;
-        user
-          .update({
-            referralCode: refCode,
-          })
-          .then(async (user) => {
-            let JWTVerificationToken = jwt.sign(
-              {
-                id: user.id,
-                name: user.name,
-              },
-              config.secret,
-              { expiresIn: "1h" }
-            );
-            const code = getRndInteger();
-            VerificationToken.create({
-              u_id: user.id,
-              code: code,
-              token: JWTVerificationToken,
-            });
+      .then(async (user) => {
+        let JWTVerificationToken = jwt.sign(
+          {
+            id: user.id,
+            name: user.name,
+          },
+          config.secret,
+          { expiresIn: "1h" }
+        );
+        const code = getRndInteger();
+        VerificationToken.create({
+          u_id: user.id,
+          code: code,
+          token: JWTVerificationToken,
+        });
 
-            //sending verificaiton email
-            await email.sendVerificationEmail(
-              user.email,
-              code,
-              JWTVerificationToken
-            );
-            //sending verificaiton email
+        //sending verificaiton email
+        // await email.sendVerificationEmail(
+        //   user.email,
+        //   code,
+        //   JWTVerificationToken
+        // );
+        //sending verificaiton email
 
-            if (req.body.referralCode != "") {
-              Refferal.create({
-                u_id_reffered_by: req.body.referralCode,
-                u_id_reffered: user.id,
-              });
-            }
+        // if (req.body.referralCode != "") {
+        //   Refferal.create({
+        //     u_id_reffered_by: req.body.referralCode,
+        //     u_id_reffered: user.id,
+        //   });
+        // }
 
-            res.status(200).send({
-              id: user.id,
-              mobile: user.mobile,
-              accessToken: JWTVerificationToken,
-            });
-          });
+        res.status(200).send({
+          id: user.id,
+          mobile: user.mobile,
+          accessToken: JWTVerificationToken,
+        });
       })
       .catch((err) => {
         res.status(500).send({

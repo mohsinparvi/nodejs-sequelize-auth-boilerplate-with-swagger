@@ -19,7 +19,7 @@ module.exports = (app) => {
     `${pre_path}/auth/signup`,
     [
       verifySignUp.checkDuplicateMobile,
-      referral.ifReferralExist,
+      // referral.ifReferralExist,
       validations.validate("signup"),
     ],
     auth.signup
